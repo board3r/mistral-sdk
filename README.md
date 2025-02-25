@@ -114,7 +114,7 @@ $response = $client->chat()->post($request);
 
 ###  [agents()](https://docs.mistral.ai/api/#tag/agents)
 - post() | [AgentsCompletionRequest](#AgentsCompletionRequest) > [AgentsCompletionResponse](#AgentsCompletionResponse)
-- postStreamed() | [AgentsCompletionRequest](#AgentsCompletionRequest) > [AgentsCompletionResponse](#AgentsCompletionResponse)
+- postStreamed() | [AgentsCompletionRequest](#AgentsCompletionRequest) >~~~~ [AgentsCompletionResponse](#AgentsCompletionResponse)
 
 ###  [fim()](https://docs.mistral.ai/api/#tag/fim)
 - post() | [FimCompletionRequest](#FimCompletionRequest) > [FimCompletionResponse](#FimCompletionResponse)
