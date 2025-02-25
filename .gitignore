@@ -1,0 +1,7 @@
+.idea
+vendor
+tests/Fixtures/Saloon
+*.cache
+composer.lock
+.env
+phpunit.xml

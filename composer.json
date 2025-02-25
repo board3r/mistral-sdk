@@ -1,0 +1,50 @@
+{
+  "name": "board3r/mistral-sdk",
+  "description": "PHP SDK for Mistral.ai API",
+  "keywords": [
+    "mistral",
+    "ai",
+    "php",
+    "sdk"
+  ],
+  "authors": [
+    {
+      "name": "Maxime DANJOU",
+      "email": "mddev.ai31@gmail.com",
+      "role": "Developer"
+    }
+  ],
+  "type": "library",
+  "require": {
+    "php": "^8.2",
+    "saloonphp/saloon": "^3.10",
+    "jasny/phpdoc-parser": "^1.0",
+    "stolt/json-lines": "^4.1"
+  },
+  "require-dev": {
+    "pestphp/pest": "^3.7",
+    "phpstan/phpstan": "^2.1",
+    "friendsofphp/php-cs-fixer": "^3.69",
+    "symfony/var-dumper": "^7.2"
+  },
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Board3r\\MistralSdk\\": "src/"
+    },
+    "files": [
+      "./src/Helpers/Functions.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Board3r\\MistralSdk\\Tests\\": "tests/"
+    }
+  },
+  "minimum-stability": "stable",
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}

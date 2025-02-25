@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd"
+         backupGlobals="false"
+         beStrictAboutTestsThatDoNotTestAnything="true"
+         beStrictAboutOutputDuringTests="true"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         failOnRisky="true"
+         failOnWarning="false"
+         processIsolation="false"
+         stopOnError="false"
+         stopOnFailure="false"
+         backupStaticProperties="false"
+>
+    <testsuites>
+        <testsuite name="default">
+            <directory suffix=".php">./tests</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory suffix=".php">./src</directory>
+        </include>
+    </source>
+    <php>
+        <env name="MISTRAL_API_KEY" value="[YOUR_API_KEY]" force="true" />
+        <env name="CODESTRAL_API_KEY" value="[YOUR_API_KEY]" force="true" />
+        <env name="MISTRAL_BASE_URL" value="https://api.mistral.ai/v1" force="true" />
+        <env name="CODESTRAL_BASE_URL" value="https://codestral.mistral.ai/v1" force="true" />
+        <env name="MISTRAL_AGENT_ID" value="[YOUR_AGENT_ID]" force="true" />
+        <env name="FILE_ID" value="[YOUR_FILE_ID]" force="true" />
+        <env name="MISTRAL_SESSION_ENABLED" value="false" force="true" />
+        <env name="MISTRAL_SESSION_HISTORY" value="10" force="true" />
+        <env name="MISTRAL_CONNECT_TIMEOUT" value="30" force="true" />
+        <env name="MISTRAL_REQUEST_TIMEOUT" value="60" force="true" />
+    </php>
+</phpunit>
