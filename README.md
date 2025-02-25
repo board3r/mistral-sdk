@@ -8,7 +8,7 @@
 
 ## Introduction
 
-This PHP library offers a straightforward wrapper for the Mistral API, enabling seamless integration of the Mistral API into your PHP projects.
+This PHP library provides a straightforward wrapper for the Mistral API, enabling seamless integration of the Mistral API into your PHP projects.
 
 _Coming soon :_
 - _Fine tuning API_
@@ -22,7 +22,7 @@ _Coming soon :_
 - Support for various Mistral models
 - Flexible configuration
 - Full Data To Object approach (request and response)
-- Trick integration for messages functions
+- Trick integration for message functions
 - Built-in testing to ensure reliability
 
 ## Requirements
@@ -32,7 +32,7 @@ _Coming soon :_
 
 ## Installation
 
-You can install the package via composer :
+You can install the package via Composer:
 
 ```bash
 composer require board3r/mistral-sdk
@@ -398,7 +398,7 @@ $request->setModel(ModelEnum::large->value);
 
 ```
 
-Premier models
+**Premium Models:**
 - codestral = 'codestral-latest'
 - large = 'mistral-large-latest'
 - pixtral = 'pixtral-large-latest'
@@ -408,15 +408,15 @@ Premier models
 - embed = 'mistral-embed'
 - moderation = 'mistral-moderation-latest'
 
-Free Models
+**Free Models:**
 - small = 'mistral-small-latest'
 - pixtral12b = 'pixtral-12b-2409'
 
-Research models
+**Research Models:**
 - nemo = 'open-mistral-nemo'
 - mamba = 'open-codestral-mamba'
 
-Legacy
+**Legacy Models:**
 - mistral7b = 'open-mistral-7b'
 - mixtral8x7b = 'open-mixtral-8x7b'
 - mixtral8x22B = 'open-mixtral-8x22b'
@@ -449,7 +449,7 @@ See [Mistral.AI](https://mistral.ai/) for more information.
 
 ## Special Thanks
 
-This package is inspired by https://github.com/HelgeSverre/mistral
+This package is inspired by [Helge Sverre's Mistral](https://github.com/HelgeSverre/mistral).
 
 And their code helped me : 
 - [Saloon PHP](https://github.com/saloonphp/saloon) / Simplify all the API requests
