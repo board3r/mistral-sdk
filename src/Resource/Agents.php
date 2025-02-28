@@ -5,7 +5,7 @@ namespace Board3r\MistralSdk\Resource;
 use Board3r\MistralSdk\Concerns\HandlesStreamedResponses;
 use Board3r\MistralSdk\Dto\Request\AgentsCompletionRequest;
 use Board3r\MistralSdk\Dto\Response\AgentsCompletionResponse;
-use Board3r\MistralSdk\Helpers\SessionHelper;
+use Board3r\MistralSdk\Helpers\HistoryHelper;
 use Board3r\MistralSdk\Middleware\SessionAgentsRequest;
 use Board3r\MistralSdk\Middleware\SessionAgentsResponse;
 use Board3r\MistralSdk\Mistral;
@@ -63,7 +63,7 @@ class Agents extends BaseResource
     protected function getRequestWithMiddleware(array|AgentsCompletionRequest $data): PostAgentsCompletion
     {
         $request = new PostAgentsCompletion($data);
-        if (SessionHelper::isEnabled()) {
+        if (HistoryHelper::isEnabled()) {
             $request->middleware()->onRequest(new SessionAgentsRequest())->onResponse(new SessionAgentsResponse());
         }
         return $request;

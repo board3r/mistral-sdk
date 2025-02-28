@@ -1,25 +1,25 @@
 <?php
 
 use Board3r\MistralSdk\Enums\RoleEnum;
-use Board3r\MistralSdk\Helpers\SessionHelper;
+use Board3r\MistralSdk\Helpers\HistoryHelper;
 
 test('Session params', function () {
-    SessionHelper::disable();
-    SessionHelper::enable();
-    $stateEnabled = SessionHelper::isEnabled();
+    HistoryHelper::disable();
+    HistoryHelper::enable();
+    $stateEnabled = HistoryHelper::isEnabled();
     $history = 5;
-    SessionHelper::setHistory($history);
-    $stateHistory = SessionHelper::getHistory();
+    HistoryHelper::setParamHistory($history);
+    $stateHistory = HistoryHelper::getParamHistory();
 
     expect($stateEnabled)->toBeTrue()
         ->and($stateHistory)->toBe($history);
 });
 
 test('Add message', function ($messages) {
-    SessionHelper::enable();
-    SessionHelper::resetMessages('chat');
-    SessionHelper::addMessages($messages, 'chat');
-    $sessionMessages = SessionHelper::getMessages('chat');
+    HistoryHelper::enable();
+    HistoryHelper::resetMessages();
+    HistoryHelper::addMessages($messages );
+    $sessionMessages = HistoryHelper::getMessagesHistory();
 
     $countUserMessage = 0;
     $promptPresent = (isset($messages[0]['role']) && $messages[0]['role'] == RoleEnum::system->value);
@@ -35,11 +35,10 @@ test('Add message', function ($messages) {
             $countUserSessionMessage++;
         }
     }
-    //dump($sessionMessages);
     expect($sessionMessages)->toBeArray()
-        ->and($countUserSessionMessage)->when($countUserMessage >= SessionHelper::getHistory(),
-            fn($countUserSessionMessage) => $countUserSessionMessage->toBeLessThanOrEqual(SessionHelper::getHistory()))
-        ->and($countUserSessionMessage)->when($countUserMessage < SessionHelper::getHistory(),
+        ->and($countUserSessionMessage)->when($countUserMessage >= HistoryHelper::getParamHistory(),
+            fn($countUserSessionMessage) => $countUserSessionMessage->toBeLessThanOrEqual(HistoryHelper::getParamHistory()))
+        ->and($countUserSessionMessage)->when($countUserMessage < HistoryHelper::getParamHistory(),
             fn($countUserSessionMessage) => $countUserSessionMessage->toBe($countUserMessage))
         ->and($promptPresent)->toBe($promptSessionPresent);
 })->with('session messages');

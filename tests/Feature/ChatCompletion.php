@@ -7,7 +7,7 @@ use Board3r\MistralSdk\Dto\Response\ChatCompletionResponse;
 use Board3r\MistralSdk\Enums\FinishReasonEnum;
 use Board3r\MistralSdk\Enums\ModelEnum;
 use Board3r\MistralSdk\Enums\RoleEnum;
-use Board3r\MistralSdk\Helpers\SessionHelper;
+use Board3r\MistralSdk\Helpers\HistoryHelper;
 use Board3r\MistralSdk\Mistral;
 use Board3r\MistralSdk\Requests\Chat\PostChatCompletion;
 
@@ -194,8 +194,8 @@ test('Request Error Chat Completion', closure: function (string $message) {
 
 
 test('Session History Chat Completion', closure: function (string $message) {
-    SessionHelper::enable();
-    SessionHelper::resetMessages('chat');
+    HistoryHelper::enable();
+    HistoryHelper::resetMessages('chat');
     MockClient::global([
         PostChatCompletion::class => MockResponse::fixture("chat.session.step1".md5($message)),
     ]);
@@ -204,7 +204,7 @@ test('Session History Chat Completion', closure: function (string $message) {
     $request1->setModel(ModelEnum::small->value);
     $request1->addUserMessage($message);
     $response1 = $this->mistral->chat()->post($request1);
-    $sessionMessage1 = SessionHelper::getMessages('chat');
+    $sessionMessage1 = HistoryHelper::getMessagesHistory('chat');
 
     MockClient::global([
         PostChatCompletion::class => MockResponse::fixture("chat.SessionHistory.step2".md5($message)),
@@ -214,16 +214,16 @@ test('Session History Chat Completion', closure: function (string $message) {
     $request2->setModel(ModelEnum::small->value);
     $request2->addUserMessage($message);
     $response2 = $this->mistral->chat()->post($request2);
-    $sessionMessage2 = SessionHelper::getMessages('chat');
+    $sessionMessage2 = HistoryHelper::getMessagesHistory('chat');
 
     //dump($object->getChoices()->get(0)->getMessage()->getContent());
     expect($response1->status())->toBe(200)
         ->and($response2->status())->toBe(200)
         ->and($sessionMessage1)->toHaveCount(2)
         ->and($sessionMessage2)->toHaveCount(4)
-        ->and(SessionHelper::getSentMessages('chat'))->toBeEmpty()
+        ->and(HistoryHelper::getSentMessages('chat'))->toBeEmpty()
     ;
-    SessionHelper::disable();
+    HistoryHelper::disable();
 })->with('simple chat');
 
 

@@ -5,7 +5,7 @@ namespace Board3r\MistralSdk\Resource;
 use Board3r\MistralSdk\Concerns\HandlesStreamedResponses;
 use Board3r\MistralSdk\Dto\Request\ChatCompletionRequest;
 use Board3r\MistralSdk\Dto\Response\ChatCompletionResponse;
-use Board3r\MistralSdk\Helpers\SessionHelper;
+use Board3r\MistralSdk\Helpers\HistoryHelper;
 use Board3r\MistralSdk\Middleware\SessionChatRequest;
 use Board3r\MistralSdk\Middleware\SessionChatResponse;
 use Board3r\MistralSdk\Mistral;
@@ -63,7 +63,7 @@ class Chat extends BaseResource
     protected function getRequestWithMiddleware(array|ChatCompletionRequest $data): PostChatCompletion
     {
         $request = new PostChatCompletion($data);
-        if (SessionHelper::isEnabled()){
+        if (HistoryHelper::isEnabled()){
             $request->middleware()->onRequest(new SessionChatRequest())->onResponse(new SessionChatResponse());
         }
         return $request;
