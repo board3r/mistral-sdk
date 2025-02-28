@@ -5,34 +5,51 @@ namespace Board3r\MistralSdk\Helpers;
 use Board3r\MistralSdk\Enums\RoleEnum;
 use InvalidArgumentException;
 
-class SessionHelper
+class HistoryHelper
 {
-    static protected bool $enabled;
-    static protected int $history;
+    protected static SessionHandlerInterface $session;
+
+    protected static bool $enabled;
+    protected static int $history;
 
     protected const PREFIX_SESSION_KEY = 'mistral.messages.';
     protected const PREFIX_SESSION_KEY_SENT = 'mistral.messages.sent.';
 
     /**
-     * Get messages stored in session
-     * @param $type
-     * @return array
+     * Set session Handler, must be a interface of Board3r\MistralSdk\Helpers\SessionHandlerInterface
+     * @param  string  $handler
+     * @return bool
      */
-    static protected function getSession($type): array
+    public static function setSessionHandler(string $handler): bool
     {
-        $messages = $_SESSION[self::PREFIX_SESSION_KEY.$type] ?? null;
-        return $messages ? json_decode($messages, true) : [];
+        if (in_array(SessionHandlerInterface::class, class_implements($handler))) {
+            self::$session = new $handler;
+            return true;
+        }
+        return false;
     }
 
     /**
-     * Set the messages in session
-     * @param  string  $type
-     * @param  array  $value
-     * @return void
+     * Get the session object
+     * @return SessionHandlerInterface
      */
-    static protected function setSession(string $type, array $value): void
+    protected static function session(): SessionHandlerInterface
     {
-        $_SESSION[self::PREFIX_SESSION_KEY.$type] = json_encode($value);
+        if (!isset(self::$session)) {
+            self::setSessionHandler(NativeSessionHandler::class);
+        }
+        return self::$session;
+    }
+
+    /**
+     * Get messages stored in session
+     * @param  string  $type
+     * @return array
+     */
+    public static function getMessagesHistory(string $type = 'chat'): array
+    {
+        $messages = self::session()->get(self::PREFIX_SESSION_KEY.$type);
+        return $messages ? json_decode($messages, true) : [];
     }
 
     /**
@@ -51,7 +68,7 @@ class SessionHelper
      * Enable session for messages history
      * @return void
      */
-    static public function enable(): void
+    public static function enable(): void
     {
         self::$enabled = true;
     }
@@ -59,7 +76,7 @@ class SessionHelper
     /**
      * Disable session for messages history
      */
-    static public function disable(): void
+    public static function disable(): void
     {
         self::$enabled = false;
     }
@@ -68,7 +85,7 @@ class SessionHelper
      * Get the number of messages to keep in history
      * @return int
      */
-    static public function getHistory(): int
+    public static function getParamHistory(): int
     {
         if (!isset(self::$history)) {
             self::$history = getenv("MISTRAL_SESSION_HISTORY") ?: 10;
@@ -81,19 +98,9 @@ class SessionHelper
      * @param  int  $history
      * @return void
      */
-    static public function setHistory(int $history): void
+    public static function setParamHistory(int $history): void
     {
         self::$history = $history;
-    }
-
-    /**
-     * Get a message history for a type
-     * @param  string  $type
-     * @return array|false
-     */
-    public static function getMessages(string $type): array|false
-    {
-        return self::getSession($type);
     }
 
     /**
@@ -102,7 +109,7 @@ class SessionHelper
      * @param  string  $type
      * @return void
      */
-    public static function addMessages(array $messages, string $type): void
+    static public function addMessages(array $messages, string $type = 'chat'): void
     {
         foreach ($messages as $message) {
             self::addMessage($message, $type);
@@ -115,18 +122,17 @@ class SessionHelper
      * @param  string  $type
      * @throws InvalidArgumentException
      */
-    public static function addMessage(array $message, string $type): void
+    static public function addMessage(array $message, string $type = 'chat'): void
     {
         if (!isset($message['role']) || !RoleEnum::tryFrom($message['role'])) {
             throw  new InvalidArgumentException('The role is not set correctly to save the message in session.');
         }
-        if (($messages = self::getMessages($type)) !== false) {
-            // check old messages
-            $promptMessage = self::extractPromptMessage($messages);
-            $messages = self::trimMessages($messages, $promptMessage);
-            $messages = array_merge($promptMessage, $messages, self::getSentMessages($type) ,[$message]);
-            self::setSession($type, $messages);
-        }
+        // check old messages
+        $messages = self::getMessagesHistory($type);
+        $promptMessage = self::extractPromptMessage($messages);
+        $messages = self::trimMessages($messages, $promptMessage);
+        $messages = array_merge($promptMessage, $messages, self::getSentMessages($type), [$message]);
+        self::$session->write(self::PREFIX_SESSION_KEY.$type, json_encode($messages));
     }
 
     /**
@@ -157,7 +163,7 @@ class SessionHelper
         foreach ($messagesReverse as $index => $messageReverse) {
             if (isset($messageReverse['role']) && $messageReverse['role'] == RoleEnum::user->value) {
                 $history++;
-                if ($history > self::getHistory()) {
+                if ($history > self::getParamHistory()) {
                     $messages = array_slice($messages, $promptMessage ? $index + 1 : $index);
                     break;
                 }
@@ -171,9 +177,9 @@ class SessionHelper
      * @param  string  $type
      * @return void
      */
-    public static function resetMessages(string $type): void
+    public static function resetMessages(string $type = 'chat'): void
     {
-        unset($_SESSION[self::PREFIX_SESSION_KEY.$type]);
+        self::session()->unset(self::PREFIX_SESSION_KEY.$type);
     }
 
     /**
@@ -182,9 +188,9 @@ class SessionHelper
      * @param  string  $type
      * @return void
      */
-    public static function addSentMessages(array $messages, string $type): void
+    public static function addSentMessages(array $messages, string $type = 'chat'): void
     {
-        $_SESSION[self::PREFIX_SESSION_KEY_SENT.$type] = json_encode($messages);
+        self::session()->write(self::PREFIX_SESSION_KEY_SENT.$type, json_encode($messages));
     }
 
     /**
@@ -192,9 +198,12 @@ class SessionHelper
      * @param  string  $type
      * @return array
      */
-    public static function getSentMessages(string $type): array
+    public static function getSentMessages(string $type = 'chat'): array
     {
-        return isset($_SESSION[self::PREFIX_SESSION_KEY_SENT.$type]) ? json_decode($_SESSION[self::PREFIX_SESSION_KEY_SENT.$type]) : [];
+        if (self::session()->has(self::PREFIX_SESSION_KEY_SENT.$type)) {
+            return json_decode(self::session()->get(self::PREFIX_SESSION_KEY_SENT.$type));
+        }
+        return [];
     }
 
     /**
@@ -202,8 +211,8 @@ class SessionHelper
      * @param  string  $type
      * @return void
      */
-    public static function resetSentMessages(string $type): void
+    public static function resetSentMessages(string $type = 'chat'): void
     {
-        unset($_SESSION[self::PREFIX_SESSION_KEY_SENT.$type]);
+        self::$session->unset(self::PREFIX_SESSION_KEY_SENT.$type);
     }
 }

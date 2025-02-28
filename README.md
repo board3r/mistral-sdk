@@ -154,20 +154,22 @@ foreach ($stream as $chunk) {
 ```
 
 ## Chat history Session
+Streamed responses are not supported by the Chat history Session. 
 
 Use the lazy mode to keep the conversation in session and send it automatically on each request.
 
-Enable session history using the [.env](#configuration) configuration or using the helper 
+Enable session history using the [.env](#configuration) configuration or using the helper
 
 ```php
-use Board3r\MistralSdk\Helpers\SessionHelper;
-SessionHelper::enable();
+use Board3r\MistralSdk\Helpers\HistoryHelper;
+HistoryHelper::enable();
 ```
 To configure the number of messages retained in the conversation history, set a limit on the number of user messages that are stored. While system, assistant, and tool messages will remain in the session, they will not count towards the history limit. This setup helps manage the conversation context efficiently.
 The limit can be set using the [.env](#configuration) configuration or using the helper
+
 ```php
-use Board3r\MistralSdk\Helpers\SessionHelper;
-SessionHelper::setHistory(10);
+use Board3r\MistralSdk\Helpers\HistoryHelper;
+HistoryHelper::setParamHistory(10);
 ```
 If the conversation start with a prompt (system message), this prompt will always be used ast first message and will not be erased from your history.   
 

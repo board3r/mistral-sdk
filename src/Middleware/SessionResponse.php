@@ -2,13 +2,12 @@
 
 namespace Board3r\MistralSdk\Middleware;
 
-use Board3r\MistralSdk\Helpers\SessionHelper;
+use Board3r\MistralSdk\Helpers\HistoryHelper;
 use Saloon\Contracts\ResponseMiddleware;
 use Saloon\Http\Response;
 
 class SessionResponse implements ResponseMiddleware
 {
-
     protected string $sessionType;
 
     public function __invoke(Response $response): void
@@ -23,9 +22,9 @@ class SessionResponse implements ResponseMiddleware
                     }
                 }
                 // keep the response in memory, add also sent messages
-                SessionHelper::addMessages($messages, $this->sessionType);
+                HistoryHelper::addMessages($messages, $this->sessionType);
                 // reset sent messages
-                SessionHelper::resetSentMessages($this->sessionType);
+                HistoryHelper::resetSentMessages($this->sessionType);
             }
         }
     }
