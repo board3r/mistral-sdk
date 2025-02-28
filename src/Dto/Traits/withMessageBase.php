@@ -101,7 +101,7 @@ trait withMessageBase
     {
         $content = $this->formatContentMessage($message, $type);
         if ($content) {
-            $message = ['content' => $content, 'role' => RoleEnum::system->value];
+            $message = ['content' => $content, 'role' => RoleEnum::tool->value];
             if (isset($name)) {
                 $message['name'] = $name;
             }
@@ -145,6 +145,8 @@ trait withMessageBase
                         throw new InvalidArgumentException($message.' must be an array for reference');
                     }
                     break;
+                default:
+                    throw new InvalidArgumentException('Content type "'.$type.'" is unknown');
             }
         } else {
             $content = $message;
